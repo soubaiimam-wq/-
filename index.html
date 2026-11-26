@@ -89,5 +89,187 @@
       <section id="s-home" class="sec active">
         <div class="hero">
           <h2 data-k="heroTitle">مرحباً بك في مذاكر – المنصة التعليمية المغربية</h2>
-          <p data-k="heroDesc" style="margin:8px 0 14px; color:#DBEAFE;">اختر مستواك الدراسي وفق المنهاج المغربي (من 1 ابتدائي إلى 2
-            
+          <p data-k="heroDesc" style="margin:8px 0 14px; color:#DBEAFE;">اختر مستواك الدراسي وفق المنهاج المغربي (من 1 ابتدائي إلى 2 باكالوريا) مجاناً بالكامل.</p>
+          <button class="btn btn-green" onclick="go('s-lessons')" data-k="goBtn">استكشف الدروس</button>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-bottom:10px; color:var(--navy);" data-k="chooseGrade">اختيار المستوى الدراسي والشعبة</h3>
+          <div id="cycles" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px;"></div>
+          <div id="grades" class="grid" style="grid-template-columns:repeat(auto-fill, minmax(150px,1fr));"></div>
+          <div id="tracks-wrap" style="display:none; margin-top:12px;">
+            <strong style="display:block; margin-bottom:6px;" data-k="chooseTrack">الشعبة / المسلك:</strong>
+            <div id="tracks" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="item" onclick="go('s-lessons')"><strong>📚 <span data-k="navLessons">مكتبة الدروس</span></strong></div>
+          <div class="item" onclick="go('s-ex')"><strong>✍️ <span data-k="navEx">التمارين والفروض</span></strong></div>
+          <div class="item" onclick="go('s-sum')"><strong>📝 <span data-k="navSum">ملخصات الدروس</span></strong></div>
+          <div class="item" onclick="go('s-ai')"><strong>🤖 <span data-k="navAi">أستاذ مذاكر</span></strong></div>
+          <div class="item" onclick="go('s-ocr')"><strong>📷 <span data-k="navOcr">قارئ الصور</span></strong></div>
+          <div class="item" onclick="go('s-plan')"><strong>⏱️ <span data-k="navPlan">تنظيم الوقت</span></strong></div>
+          <div class="item" onclick="go('s-prog')"><strong>📈 <span data-k="navProg">تقدم التلميذ</span></strong></div>
+        </div>
+      </section>
+
+      <section id="s-lessons" class="sec">
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+            <h2 style="color:var(--navy);" data-k="navLessons">مكتبة الدروس</h2>
+            <select id="sub-filter" onchange="loadContent()" style="padding:8px; border-radius:10px; border:1px solid var(--border); font-family:inherit;"></select>
+          </div>
+          <div id="lessons-box" class="grid"></div>
+        </div>
+      </section>
+
+      <section id="s-ex" class="sec">
+        <div class="card"><h2 style="color:var(--navy); margin-bottom:10px;" data-k="exTitle">التمارين التفاعلية</h2><div id="ex-box"></div></div>
+        <div class="card"><h2 style="color:var(--navy); margin-bottom:10px;" data-k="pdfTitle">الفروض والامتحانات (PDF)</h2><div id="exams-box" class="grid"></div></div>
+      </section>
+
+      <section id="s-sum" class="sec">
+        <div class="card"><h2 style="color:var(--navy); margin-bottom:10px;" data-k="navSum">ملخصات الدروس</h2><div id="sum-box" class="grid"></div></div>
+      </section>
+
+      <section id="s-ai" class="sec">
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <h2>🤖 <span data-k="navAi">أستاذ مذاكر</span></h2>
+            <span class="demo-tag" data-k="protoTag">نسخة تجريبية للمعاينة (غير متصلة بنموذج AI فعلي بعد)</span>
+          </div>
+          <div class="chat-box" id="chat-box">
+            <div class="msg bot">مرحباً! هذه واجهة أولية تجريبية لـ «أستاذ مذاكر»، وسيُفعّل الذكاء الاصطناعي الحقيقي بعد ربطه واختباره.</div>
+          </div>
+          <form onsubmit="sendChat(event)" style="display:flex; gap:8px;">
+            <input id="chat-q" type="text" placeholder="اكتب سؤالك هنا..." style="flex:1; padding:10px; border-radius:10px; border:1px solid var(--border); font-family:inherit;" required />
+            <button class="btn btn-navy" type="submit">إرسال</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="s-ocr" class="sec">
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+            <h2>📷 <span data-k="navOcr">قارئ الصور</span></h2>
+            <span class="demo-tag" data-k="protoTag">نموذج أولي تجريبي للمعاينة</span>
+          </div>
+          <input type="file" accept="image/*" onchange="previewOcr(event)" />
+          <img id="ocr-img" style="display:none; max-width:100%; max-height:260px; margin-top:12px; border-radius:12px;" />
+          <p id="ocr-msg" style="display:none; margin-top:10px; padding:10px; background:var(--green-soft); border-radius:10px; font-size:0.88rem;">تمت معاينة الصورة بنجاح. سيتم ربط خدمة استخراج النص (OCR) لاحقاً بعد اختبارها.</p>
+        </div>
+      </section>
+
+      <section id="s-plan" class="sec">
+        <div class="card">
+          <h2>⏱️ مؤقت المراجعة (بومودورو 25 دقيقة)</h2>
+          <div id="pomo" style="font-size:2.4rem; font-weight:800; color:var(--navy); margin:10px 0;">25:00</div>
+          <button class="btn btn-green" onclick="startP()">ابدأ</button>
+          <button class="btn btn-navy" onclick="pauseP()">إيقاف مؤقت</button>
+          <button class="btn" style="border:1px solid var(--border);" onclick="resetP()">إعادة</button>
+        </div>
+      </section>
+
+      <section id="s-prog" class="sec">
+        <div class="card">
+          <h2>📈 <span data-k="navProg">تقدم التلميذ</span></h2>
+          <p id="prog-text" style="margin-top:10px; font-weight:700;"></p>
+          <div class="track-bar"><div class="track-fill" id="prog-bar"></div></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="modal" onclick="if(event.target.id==='modal') this.classList.remove('open')">
+    <div class="modal-in">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h3 id="m-title" style="color:var(--navy);"></h3>
+        <button class="btn" onclick="document.getElementById('modal').classList.remove('open')">✕</button>
+      </div>
+      <div id="m-body" style="white-space:pre-line; line-height:1.8;"></div>
+    </div>
+  </div>
+
+  <nav class="bnav">
+    <button class="active" data-s="s-home" onclick="go('s-home')">🏠<span>الرئيسية</span></button>
+    <button data-s="s-lessons" onclick="go('s-lessons')">📚<span>الدروس</span></button>
+    <button data-s="s-ex" onclick="go('s-ex')">✍️<span>التمارين</span></button>
+    <button data-s="s-sum" onclick="go('s-sum')">📝<span>الملخصات</span></button>
+    <button data-s="s-plan" onclick="go('s-plan')">⏱️<span>الوقت</span></button>
+  </nav>
+
+  <footer>
+    مذاكر – Moudhakkir | منصة مجانية لتلاميذ المغرب • <a href="./admin.html" style="color:var(--navy-light);">دخول المطور</a>
+  </footer>
+
+  <script>
+    const SUPABASE_URL = 'https://rdbdfirmgatghmxdrmbp.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_BPJGaWqlyS6vw--_Ha1mGQ_2f4fT4cl';
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const T = {
+      ar: { dir:'rtl', navHome:'الرئيسية', navLessons:'مكتبة الدروس', navEx:'التمارين والفروض', navSum:'ملخصات الدروس', navAi:'أستاذ مذاكر', navOcr:'قارئ الصور', navPlan:'تنظيم الوقت', navProg:'تقدم التلميذ', heroTitle:'مرحباً بك في مذاكر – المنصة التعليمية المغربية', heroDesc:'اختر مستواك الدراسي وفق المنهاج المغربي (من 1 ابتدائي إلى 2 باكالوريا) مجاناً بالكامل.', goBtn:'استكشف الدروس', chooseGrade:'اختيار المستوى الدراسي والشعبة', chooseTrack:'الشعبة / المسلك:', exTitle:'التمارين التفاعلية', pdfTitle:'الفروض والامتحانات (PDF)', protoTag:'نسخة تجريبية للمعاينة (غير متصلة بالذكاء الاصطناعي بعد)', empty:'لا توجد عناصر مضافة لهذا المستوى بعد.', allSub:'-- كل المواد --' },
+      fr: { dir:'ltr', navHome:'Accueil', navLessons:'Cours', navEx:'Exercices & Devoirs', navSum:'Résumés', navAi:'Prof Moudhakkir', navOcr:'Lecteur d’images', navPlan:'Gestion du temps', navProg:'Progression', heroTitle:'Bienvenue sur Moudhakkir – Programme Marocain', heroDesc:'Choisissez votre niveau scolaire (1AP au 2ème Bac) gratuitement.', goBtn:'Explorer les cours', chooseGrade:'Choisir le niveau scolaire', chooseTrack:'Filière :', exTitle:'Exercices interactifs', pdfTitle:'Devoirs & Examens (PDF)', protoTag:'Prototype de démonstration (IA hors ligne)', empty:'Aucun contenu ajouté pour ce niveau.', allSub:'-- Toutes les matières --' },
+      ber:{ dir:'ltr', navHome:'ⴰⵎⵣⵡⴰⵔⵓ', navLessons:'ⵜⵉⵎⵙⵉⵔⵉⵏ', navEx:'ⵉⵍⵓⵖⵎⴰ ⴷ ⵉⵙⵉⵜⵏ', navSum:'ⵜⵉⴳⵣⴰⵍ', navAi:'ⴰⵙⵍⵎⴰⴷ ⵎⵓⴷⴰⴽⵉⵔ', navOcr:'ⴰⵎⵖⵔⴰⵢ ⵏ ⵜⵡⵍⴰⴼⵉⵏ', navPlan:'ⴰⵙⵏⵎⴰⵍⴰ ⵏ ⵡⴰⴽⵓⴷ', navProg:'ⴰⵏⴼⵍⵓⵙ', heroTitle:'ⴱⵔⵔⴽⴰⵜ ⵖⵓⵔ ⵎⵓⴷⴰⴽⵉⵔ', heroDesc:'ⵙⵜⵉ ⴰⵙⵡⵉⵔ ⵏⵏⴽ ⴳ ⵓⵖⴰⵡⴰⵙ ⴰⵎⵖⵔⴰⴱⵉ ⴱⵍⴰ ⵜⵉⵖⵔⴰⴷ.', goBtn:'ⵜⵉⵎⵙⵉⵔⵉⵏ', chooseGrade:'ⵙⵜⵉ ⴰⵙⵡⵉⵔ ⵏ ⵜⵉⵖⵔⵉ', chooseTrack:'ⵜⴰⵣⵓⵏⵉ:', exTitle:'ⵉⵍⵓⵖⵎⴰ', pdfTitle:'ⵉⵙⵉⵜⵏ (PDF)', protoTag:'ⴰⵎⴷⵢⴰ ⴰⵔⵉⵎ', empty:'ⵓⵔ ⵜⵜⵓⵔⵏⵓⵏⵜ ⵜⵎⵙⵉⵔⵉⵏ ⵉ ⵓⵙⵡⵉⵔ ⴰⴷ ⵙⵓⵍ.', allSub:'-- ⵜⵉⵏⴳⴰⵡⵉⵏ ⵎⴰⵕⵕⴰ --' }
+    };
+
+    let st = { lang:'ar', cycle:'primary', grade:'1ap', track:'', read:[], solved:[] };
+    try { const s = localStorage.getItem('moudhakkir_stu'); if (s) st = { ...st, ...JSON.parse(s) }; } catch {}
+    const saveSt = () => { try { localStorage.setItem('moudhakkir_stu', JSON.stringify(st)); } catch {} };
+
+    let db = { cycles:[], grades:[], tracks:[], subjects:[], lessons:[] };
+    const esc = s => String(s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    const nm = o => o ? (o['name_'+st.lang] || o.name_ar || '') : '';
+
+    function setLang(l) {
+      st.lang = l; saveSt();
+      document.documentElement.lang = l;
+      document.documentElement.dir = T[l].dir;
+      ['ar','fr','ber'].forEach(x => document.getElementById('la-'+x).classList.toggle('active', x===l));
+      document.querySelectorAll('[data-k]').forEach(el => { const k = el.dataset.k; if (T[l][k]) el.textContent = T[l][k]; });
+      renderUI(); loadContent();
+    }
+
+    function go(id) {
+      document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.querySelectorAll('aside .nav-btn, nav.bnav button').forEach(b => b.classList.toggle('active', b.dataset.s === id));
+      window.scrollTo({ top:0, behavior:'smooth' });
+    }
+
+    async function init() {
+      const [c, g, t, s] = await Promise.all([
+        sb.from('cycles').select('*').order('order_index'),
+        sb.from('grades').select('*').order('order_index'),
+        sb.from('tracks').select('*'),
+        sb.from('subjects').select('*')
+      ]);
+      db = { ...db, cycles:c.data||[], grades:g.data||[], tracks:t.data||[], subjects:s.data||[] };
+      setLang(st.lang);
+    }
+
+    function renderUI() {
+      if (!db.cycles.length) return;
+      document.getElementById('cycles').innerHTML = db.cycles.map(c =>
+        `<button class="pill ${st.cycle===c.id?'active':''}" onclick="st.cycle='${c.id}'; st.grade=db.grades.find(g=>g.cycle_id==='${c.id}').id; st.track=''; saveSt(); renderUI(); loadContent();">${esc(nm(c))}</button>`
+      ).join('');
+
+      document.getElementById('grades').innerHTML = db.grades.filter(g => g.cycle_id === st.cycle).map(g =>
+        `<div class="item" style="${st.grade===g.id?'border-color:var(--navy); background:var(--navy-soft);':''}" onclick="st.grade='${g.id}'; st.track=''; saveSt(); renderUI(); loadContent();"><strong>${esc(nm(g))}</strong></div>`
+      ).join('');
+
+      const trs = db.tracks.filter(t => t.grade_id === st.grade);
+      const tw = document.getElementById('tracks-wrap');
+      if (trs.length) {
+        tw.style.display = 'block';
+        if (!st.track || !trs.some(x => x.id === st.track)) st.track = trs[0].id;
+        document.getElementById('tracks').innerHTML = trs.map(t =>
+          `<button class="pill ${st.track===t.id?'active':''}" onclick="st.track='${t.id}'; saveSt(); renderUI(); loadContent();">${esc(nm(t))}</button>`
+        ).join('');
+      } else { tw.style.display = 'none'; st.track = ''; }
+
+      const ag = db.grades.find(g => g.id === st.grade);
+      document.getElementById('active-grade').textContent = nm(ag);
+
+      const s
