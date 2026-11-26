@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة المطور | مذاكر</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root { --navy:#0B1F3A; --green:#22C55E; --bg:#F4F7FB; --border:#E2E8F0; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Cairo', sans-serif; background:var(--bg); color:#0F172A; line-height:1.6; }
+    header { background:var(--navy); color:#fff; padding:14px 18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+    .wrap { max-width:900px; margin:18px auto; padding:0 14px 50px; }
+    .card { background:#fff; border:1px solid var(--border); border-radius:16px; padding:18px; margin-bottom:16px; }
+    label { display:block; font-weight:700; font-size:0.85rem; margin-bottom:4px; color:var(--navy); }
+    input, select, textarea { width:100%; padding:10px; border:1px solid var(--border); border-radius:10px; font-family:inherit; margin-bottom:10px; background:#fff; }
+    textarea { min-height:100px; }
+    .btn { border:none; padding:10px 16px; border-radius:10px; font-family:inherit; font-weight:700; cursor:pointer; }
+    .btn-navy { background:var(--navy); color:#fff; }
+    .btn-green { background:var(--green); color:var(--navy); }
+    .btn-red { background:#DC2626; color:#fff; }
+    .tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+    .tab-btn { padding:8px 12px; border-radius:10px; border:1px solid var(--border); background:#fff; font-family:inherit; font-weight:700; cursor:pointer; }
+    .tab-btn.active { background:var(--navy); color:#fff; }
+    .pane { display:none; }
+    .pane.active { display:block; }
+    .msg { padding:10px; border-radius:10px; margin-bottom:12px; font-weight:700; display:none; }
+    .msg.ok { display:block; background:#DCFCE7; color:#14532D; }
+    .msg.err { display:block; background:#FEE2E2; color:#7F1D1D; }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>🔐 لوحة المطور الوحيد – مذاكر</strong>
+    <div style="display:flex; gap:8px;">
+      <a href="./index.html" class="btn btn-green" style="text-decoration:none;">موقع التلاميذ ↗</a>
+      <button id="btn-logout" class="btn btn-red" style="display:none;" onclick="logout()">خروج</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div id="login-box" class="card" style="display:none; max-width:420px; margin:30px auto;">
+      <h2 style="margin-bottom:12px; color:var(--navy);">دخول المطور الوحيد</h2>
+      <div id="login-msg" class="msg"></div>
+      <form onsubmit="login(event)">
+        <label>البريد الإلكتروني</label>
+        <input type="email" id="email" value="soubaiimam@gmail.com" required />
+        <label>كلمة المرور</label>
+        <input type="password" id="password" required />
+        <button class="btn btn-navy" style="width:100%;" type="submit">دخول</button>
+      </form>
+    </div>
+
+    <div id="work-box" style="display:none;">
+      <div id="global-msg" class="msg"></div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('p-lesson', this)">📚 إضافة درس</button>
+        <button class="tab-btn" onclick="openTab('p-summary', this)">📝 إضافة ملخص</button>
+        <button class="tab-btn" onclick="openTab('p-exercise', this)">✍️ إضافة تمرين</button>
+        <button class="tab-btn" onclick="openTab('p-exam', this)">📄 رفع فرض PDF</button>
+        <button class="tab-btn" onclick="openTab('p-manage', this)">🗂️ إدارة المحتوى</button>
+      </div>
+
+      <div id="p-lesson" class="pane active card">
+        <h3 style="margin-bottom:10px;">إضافة درس جديد</h3>
+        <form onsubmit="addLesson(event)">
+          <label>المستوى</label><select id="l-grade" onchange="fillTracks('l-grade','l-track')"></select>
+          <label>الشعبة (للتأهيلي)</label><select id="l-track"></select>
+          <label>المادة</label><select id="l-subject"></select>
+          <label>الدورة</label><select id="l-sem"><option value="1">الأولى</option><option value="2">الثانية</option></select>
+          <label>العنوان بالعربية*</label><input id="l-t-ar" required />
+          <label>العنوان بالفرنسية</label><input id="l-t-fr" dir="ltr" />
+          <label>العنوان بالأمازيغية (تيفيناغ)</label><input id="l-t-ber" dir="ltr" />
+          <label>محتوى الدرس بالعربية*</label><textarea id="l-c-ar" required></textarea>
+          <label>محتوى الدرس بالفرنسية</label><textarea id="l-c-fr" dir="ltr"></textarea>
+          <labe
