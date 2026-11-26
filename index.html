@@ -192,5 +192,94 @@ if(sb){Promise.all([sb.from('cycles').select('*').order('order_index'),sb.from('
   if(r[0].error){$('err').style.display='block';$('err').textContent=r[0].error.message;return}
   db.cycles=r[0].data||[];db.grades=r[1].data||[];db.tracks=r[2].data||[];db.subjects=r[3].data||[];renderUI();loadC();
 })}
-</script></body>
+</script>
+<div id="mzSchedule" dir="rtl" style="padding:20px;background:#f4f7ff;border-radius:15px;margin:20px;">
+  <h2>📚 جدول المراجعة الذكي</h2>
+  <p>اختر سنتك الدراسية ومدة المراجعة اليومية.</p>
+  <select id="mzGrade">
+    <option value="">اختر السنة الدراسية</option>
+  </select>
+  <input id="mzHours" type="number" min="1" max="12" value="3" placeholder="ساعات المراجعة">
+  <button id="mzCreate">إنشاء جدول المراجعة</button>
+  <div id="mzResult"></div>
+</div>
+  <script>
+(async function mzScheduleInit() {
+  const grade = document.getElementById('mzGrade');
+  const hours = document.getElementById('mzHours');
+  const button = document.getElementById('mzCreate');
+  const result = document.getElementById('mzResult');
+
+  if (typeof sb === 'undefined') {
+    result.textContent = 'تعذر الاتصال بقاعدة البيانات.';
+    return;
+  }
+
+  const { data, error } = await sb
+    .from('grades')
+    .select('id,name_ar,order_index')
+    .order('order_index');
+
+  if (error) {
+    result.textContent = 'تعذر تحميل السنوات الدراسية.';
+    return;
+  }
+
+  (data || []).forEach(g => {
+    const option = document.createElement('option');
+    option.value = g.id;
+    option.textContent = g.name_ar;
+    grade.appendChild(option);
+  });
+
+  button.addEventListener('click', async () => {
+    if (!grade.value) {
+      result.textContent = 'اختر السنة الدراسية أولاً.';
+      return;
+    }
+
+    const { data: subjects, error } = await sb
+      .from('curriculum_subjects')
+      .select('coefficient, subjects(name_ar)')
+      .eq('grade_id', grade.value);
+
+    if (error || !subjects || !subjects.length) {
+      result.textContent = 'لم نجد مواد لهذه السنة.';
+      return;
+    }
+
+    const valid = subjects.filter(s =>
+      s.subjects && Number(s.coefficient) > 0
+    );
+
+    const total = valid.reduce(
+      (sum, s) => sum + Number(s.coefficient), 0
+    );
+
+    if (!total) {
+      result.textContent = 'لا توجد معاملات صالحة.';
+      return;
+    }
+
+    result.replaceChildren();
+
+    const title = document.createElement('h3');
+    title.textContent = 'جدولك اليومي';
+    result.appendChild(title);
+
+    valid.forEach(s => {
+      const minutes = Math.round(
+        Number(hours.value) * 60 *
+        Number(s.coefficient) / total
+      );
+
+      const line = document.createElement('p');
+      line.textContent =
+        s.subjects.name_ar + ': ' + minutes + ' دقيقة';
+      result.appendChild(line);
+    });
+  });
+})();
+        </script>
+</body>
 </html>
