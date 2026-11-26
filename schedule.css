@@ -1,0 +1,32 @@
+/* مذاكر – جدول المراجعة الذكي: أنماط إضافية تعيد استعمال ألوان index.html */
+.sc-h{color:var(--nv);margin-bottom:6px;font-size:1.05rem}
+.sc-p{color:#475569;font-size:.86rem;margin:4px 0 8px}
+.sc-lvl{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px}
+.sc-lvl .btn{margin-inline-start:auto}
+.sc-days{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.sc-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:8px 0}
+.sc-lbl{display:block;font-weight:700;font-size:.78rem;color:var(--nv);margin-bottom:3px}
+.sc-in{width:100%;padding:8px;border:1px solid var(--bd);border-radius:8px;font-family:inherit;font-size:.9rem;background:#fff;color:inherit}
+.sc-in:focus-visible,.btn:focus-visible,.pill:focus-visible{outline:2px solid var(--n2);outline-offset:2px}
+.sc-list{margin-top:10px}
+.sc-bday{margin-top:8px;font-size:.86rem}
+.sc-busy{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--bd)}
+.sc-x{padding:3px 9px;background:#FEE2E2;color:#7F1D1D}
+.sc-time{font-weight:800;color:var(--nv);white-space:nowrap;direction:ltr;unicode-bidi:isolate}
+.sc-subs{display:grid;gap:6px;margin-bottom:10px}
+.sc-sub{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sc-sub .sc-in{width:auto;min-width:110px}
+.sc-name{flex:1;font-weight:700;min-width:0}
+.sc-err{display:none;background:#FEE2E2;color:#7F1D1D;padding:8px 10px;border-radius:8px;margin-bottom:10px;font-size:.86rem}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.sc-bar{height:8px;border-radius:99px;background:var(--bd);overflow:hidden;margin:6px 0}
+.sc-bar i{display:block;height:100%;background:var(--gr)}
+.sc-chips{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+.sc-day{margin-top:12px}
+.sc-day h4{color:var(--nv);margin-bottom:2px}
+.sc-sess{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;padding:8px;border:1px solid var(--bd);border-radius:10px;margin-top:6px;background:#fff}
+.sc-sess.done{background:var(--gs);border-color:#16A34A}
+.sc-sess .btn{padding:6px 10px;font-size:.8rem}
+.sc-chk{border:1px solid var(--bd)}
+.sc-clear{margin-top:14px;border:1px solid var(--bd);background:#fff}
+nav.bnav button{font-size:.62rem}
