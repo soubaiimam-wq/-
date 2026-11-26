@@ -192,6 +192,5 @@ if(sb){Promise.all([sb.from('cycles').select('*').order('order_index'),sb.from('
   if(r[0].error){$('err').style.display='block';$('err').textContent=r[0].error.message;return}
   db.cycles=r[0].data||[];db.grades=r[1].data||[];db.tracks=r[2].data||[];db.subjects=r[3].data||[];renderUI();loadC();
 })}
-</script>
-</body>
+</script></body>
 </html>
