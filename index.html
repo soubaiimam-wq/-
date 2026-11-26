@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مذاكر – Moudhakkir</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Noto+Sans+Tifinagh&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root { --navy:#0B1F3A; --navy-l:#1B4578; --navy-s:#E8F0FA; --green:#22C55E; --green-s:#DCFCE7; --bg:#F4F7FB; --border:#E2E8F0; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Cairo','Plus Jakarta Sans','Noto Sans Tifinagh',sans-serif; background:var(--bg); color:#0F172A; line-height:1.6; padding-bottom:78px; }
+    header { background:#fff; border-bottom:1px solid var(--border); padding:12px 16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; position:sticky; top:0; z-index:40; }
+    .brand { display:flex; align-items:center; gap:10px; cursor:pointer; }
+    .langs { display:flex; gap:4px; background:var(--bg); padding:4px; border-radius:10px; border:1px solid var(--border); }
+    .langs button { border:none; background:transparent; padding:7px 11px; border-radius:8px; font-family:inherit; font-weight:700; cursor:pointer; color:#475569; font-size:0.84rem; }
+    .langs button.active { background:var(--navy); color:#fff; }
+    .wrap { max-width:1100px; margin:16px auto; padding:0 14px; display:grid; grid-template-columns:230px 1fr; gap:18px; }
+    aside { background:#fff; border:1px solid var(--border); border-radius:16px; padding:14px; height:fit-content; }
+    .nav-btn { width:100%; display:flex; align-items:center; gap:8px; padding:10px 12px; border:none; background:transparent; border-radius:10px; font-family:inherit; font-weight:700; color:#475569; cursor:pointer; text-align:start; margin-bottom:4px; }
+    .nav-btn.active { background:var(--navy); color:#fff; }
+    .hero { background:linear-gradient(135deg, var(--navy), var(--navy-l)); color:#fff; padding:22px; border-radius:18px; margin-bottom:16px; }
+    .card { background:#fff; border:1px solid var(--border); border-radius:16px; padding:18px; margin-bottom:16px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(195px,1fr)); gap:12px; }
+    .item { background:#fff; border:1px solid var(--border); border-radius:12px; padding:14px; cursor:pointer; }
+    .pill { padding:7px 14px; border-radius:999px; border:1px solid var(--border); background:var(--bg); font-family:inherit; font-weight:700; cursor:pointer; }
+    .pill.active { background:var(--green); color:var(--navy); }
+    .btn { padding:9px 16px; border-radius:10px; border:none; font-family:inherit; font-weight:700; cursor:pointer; text-decoration:none; display:inline-block; }
+    .btn-green { background:var(--green); color:var(--navy); }
+    .btn-navy { background:var(--navy); color:#fff; }
+    .demo-tag { background:#FEF3C7; color:#92400E; font-size:0.75rem; font-weight:700; padding:3px 10px; border-radius:999px; display:inline-block; }
+    .opt { display:block; width:100%; text-align:start; padding:10px; margin-top:6px; border-radius:8px; border:1px solid var(--border); background:#fff; font-family:inherit; cursor:pointer; }
+    .opt.ok { background:var(--green-s); border-color:#16A34A; }
+    .opt.no { background:#FEE2E2; border-color:#DC2626; }
+    .sec { display:none; }
+    .sec.active { display:block; }
+    .chat-box { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:12px; height:220px; overflow-y:auto; margin:10px 0; display:flex; flex-direction:column; gap:8px; }
+    .msg { padding:8px 12px; border-radius:10px; max-width:85%; font-size:0.88rem; }
+    .msg.bot { background:#fff; border:1px solid var(--border); align-self:flex-start; }
+    .msg.usr { background:var(--navy); color:#fff; align-self:flex-end; }
+    nav.bnav { display:none; position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--border); justify-content:space-around; padding:7px 4px; z-index:50; }
+    nav.bnav button { border:none; background:transparent; font-family:inherit; font-size:0.72rem; font-weight:700; display:flex; flex-direction:column; align-items:center; color:#475569; cursor:pointer; }
+    nav.bnav button.active { color:var(--navy); }
+    .modal { display:none; position:fixed; inset:0; background:rgba(11,31,58,0.6); z-index:90; align-items:center; justify-content:center; padding:14px; }
+    .modal.open { display:flex; }
+    .modal-in { background:#fff; border-radius:16px; max-width:600px; width:100%; padding:20px; max-height:85vh; overflow-y:auto; }
+    footer { text-align:center; padding:14px; color:#475569; font-size:0.82rem; border-top:1px solid var(--border); background:#fff; margin-top:20px; }
+    @media (max-width:880px) { .wrap { grid-template-columns:1fr; } aside { display:none; } nav.bnav { display:flex; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand" data-go="s-home">
+      <svg width="38" height="38" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="12" fill="#0B1F3A"/><path d="M12 16C12 14.3 13.3 13 15 13H22.5C23.3 13 24 13.7 24 14.5V34.5C24 33.7 23.3 33 22.5 33H15C13.3 33 12 31.7 12 30V16Z" fill="#FFF"/><path d="M36 16C36 14.3 34.7 13 33 13H25.5C24.7 13 24 13.7 24 14.5V34.5C24 33.7 24.7 33 25.5 33H33C34.7 33 36 31.7 36 30V16Z" fill="#4ADE80"/></svg>
+      <div><strong style="color:var(--navy);">مذاكر – Moudhakkir</strong><br><small id="active-grade" style="color:#16A34A; font-weight:700;"></small></div>
+    </div>
+    <div class="langs">
+      <button type="button" class="active" data-lang="ar" id="la-ar">العربية</button>
+      <button type="button" data-lang="fr" id="la-fr">Français</button>
+      <button type="button" data-lang="ber" id="la-ber">ⵜⴰⵎⴰⵣⵉⵖⵜ</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <aside>
+      <button type="button" class="nav-btn active" data-go="s-home">🏠 <span data-k="navHome">الرئيسية</span></button>
+      <button type="button" class="nav-btn" data-go="s-lessons">📚 <span data-k="navLessons">مكتبة الدروس</span></button>
+      <button type="button" class="nav-btn" data-go="s-ex">✍️ <span data-k="navEx">التمارين والفروض</span></button>
+      <button type="button" class="nav-btn" data-go="s-sum">📝 <span data-k="navSum">ملخصات الدروس</span></button>
+      <button type="button" class="nav-btn" data-go="s-ai">🤖 <span data-k="navAi">أستاذ مذاكر</span></button>
+      <button type="button" class="nav-btn" data-go="s-ocr">📷 <span data-k="navOcr">قارئ الصور</span></button>
+      <button type="button" class="nav-btn" data-go="s-plan">⏱️ <span data-k="navPlan">تنظيم الوقت</span></button>
+      <button type="button" class="nav-btn" data-go="s-prog">📈 <span data-k="navProg">تقدم التلميذ</span></button>
+    </aside>
+
+    <main>
+      <div id="err-box" style="display:none; background:#FEE2E2; color:#7F1D1D; padding:10px; border-radius:10px; margin-bottom:12px;"></div>
+
+      <section id="s-home" class="sec active">
+        <div class="hero">
+          <h2 data-k="heroTitle">مرحباً بك في مذاكر – المنصة التعليمية المغربية</h2>
+          <p data-k="heroDesc" style="margin:8px 0 14px; color:#DBEAFE;">اختر مستواك الدراسي وفق المنهاج المغربي (من 1 ابتدائي إلى 2 باكالوريا) مجاناً بالكامل.</p>
+          <button type="button" class="btn btn-green" data-go="s-lessons" data-k="goBtn">استكشف الدروس</button>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-bottom:10px; color:var(--navy);" data-k="chooseGrade">اختيار المستوى الدراسي والشعبة</h3>
+          <div id="cycles" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px;"></div>
+          <div id="grades" class="grid" style="grid-template-columns:repeat(auto-fill, minmax(145px,1fr));"></div>
+          <div id="tracks-wrap" style="display:none; margin-top:12px;">
+            <strong style="display:block; margin-bottom:6px;" data-k="chooseTrack">الشعبة / المسلك:</strong>
+            <div id="tracks" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="item" data-go="s-lessons"><strong>📚 <span data-k="navLessons">مكتبة الدروس</span></strong></div>
+          <div class="item" data-go="s-ex"><strong>✍️ <span data-k="navEx">التمارين والفروض</span></strong></div>
+          <div class="item" data-go="s-sum"><strong>📝 <span data-k="navSum">ملخصات الدروس</span></strong></div>
+          <div class="item" data-go="s-ai"><strong>🤖 <span data-k="navAi">أستاذ مذاكر</span></strong></div>
+          <div class="item" data-go="s-ocr"><strong>📷 <span data-k="navOcr">قارئ الصور</span></strong></div>
+          <div class="item" data-go="s-plan"><strong>⏱️ <span data-k="navPlan">تنظيم الوقت</span></strong></div>
+          <div class="item" data-go="s-prog"><strong>📈 <span data-k="navProg">تقدم التلميذ</span></strong></div>
+        </div>
+      </section>
+
+      <section id="s-lessons" class="sec">
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+            <h2 style="color:var(--navy);" data-k="navLessons">مكتبة الدروس</h2>
+            <select id="sub-filter" style="padding:8px; border-radius:10px; border:1px solid var(--border); font-family:inherit;"></select>
+          </div>
+          <div id="lessons-box" class="grid"></div>
+        </div>
+      </section>
+
+      <section id="s-ex" class="sec">
+        <div class="card"><h2 style="color:var(--navy); margin-bottom:10px;" data-k="exTitle">التمارين التفاعلية</h2><div id="ex-box"></div></div>
+        <div class="card"><h2 style="color:var(--navy); margin-bottom:10px;" data-k="pdfTitle">الفروض والامتحانات (PDF)</h2><div id="exams-box" class="grid"></div></div>
+      </section>
+
+      <section id="s-sum" class="sec">
+        <div class="card"><h2 style="color:var(--navy); margin-bottom:10px;" data-k="navSum">ملخصات الدروس</h2><div id="sum-box" class="grid"></div></div>
+      </section>
+
+      <section id="s-ai" class="sec">
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <h2>🤖 <span data-k="navAi">أستاذ مذاكر</span></h2>
+            <span class="demo-tag" data-k="protoTag">نسخة تجريبية للمعاينة</span>
+          </div>
+          <div class="chat-box" id="chat-box"><div class="msg bot">مرحباً! هذه واجهة أولية تجريبية لـ «أستاذ مذاكر»، وسيُفعّل الذكاء الاصطناعي الحقيقي بعد ربطه واختباره.</div></div>
+          <form id="chat-form" style="display:flex; gap:8px;">
+            <input id="chat-q" type="text" placeholder="اكتب سؤالك هنا..." style="flex:1; padding:10px; border-radius:10px; border:1px solid var(--border); font-family:inherit;" required />
+            <button class="btn btn-navy" type="submit">إرسال</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="s-ocr" class="sec">
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+            <h2>📷 <span data-k="navOcr">قارئ الصور</span></h2>
+            <span class="demo-tag" data-k="protoTag">نموذج أولي تجريبي للمعاينة</span>
+          </div>
+          <input type="file" id="ocr-file" accept="image/*" />
+          <img id="ocr-img" style="display:none; max-width:100%; max-height:260px; margin-top:12px; border-radius:12px;" />
+          <p id="ocr-msg" style="display:none; margin-top:10px; padding:10px; background:var(--green-s); border-radius:10px; font-size:0.88rem;">تمت معاينة الصورة بنجاح. سيتم ربط خدمة استخراج النص (OCR) لاحقاً.</p>
+        </div>
+      </section>
+
+      <section id="s-plan" class="sec">
+        <div class="card">
+          <h2>⏱️ <span data-k="navPlan">تنظيم الوقت</span> (25:00)</h2>
+          <div id="pomo" style="font-size:2.4rem; font-weight:800; color:var(--navy); margin:10px 0;">25:00</div>
+          <button type="button" class="btn btn-green" id="p-start">ابدأ</button>
+          <button type="button" class="btn btn-navy" id="p-pause">إيقاف مؤقت</button>
+          <button type="button" class="btn" id="p-reset" style="border:1px solid var(--border);">إعادة</button>
+        </div>
+      </section>
+
+      <section id="s-prog" class="sec">
+        <div class="card">
+          <h2>📈 <span data-k="navProg">تقدم التلميذ</span></h2>
+          <p id="prog-text" style="margin-top:10px; font-weight:700;"></p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modal-in">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h3 id="m-title" style="color:var(--navy);"></h3>
+        <button type="button" class="btn" id="m-close">✕</button>
+      </div>
+      <div id="m-body" style="white-space:pre-line; line-height:1.8;"></div>
+    </div>
+  </div>
+
+  <nav class="bnav">
+    <button type="button" class="active" data-go="s-home">🏠<span data-k="navHome">الرئيسية</span></button>
+    <button type="button" data-go="s-lessons">📚<span data-k="navLessons">الدروس</span></button>
+    <button type="button" data-go="s-ex">✍️<span data-k="navEx">التمارين</span></button>
+    <button type="button" data-go="s-sum">📝<span data-k="navSum">الملخصات</span></button>
+    <button type="button" data-go="s-plan">⏱️<span data-k="navPlan">الوقت</span></button>
+  </nav>
+
+  <footer>مذاكر – Moudhakkir | مجاني 100% • <a href="./admin.html" style="color:var(--navy-l);">دخول المطور</a></footer>
+
+  <script>
+    window.onerror = function(msg) {
+      const b = document.getElementById('err-box');
+      if (b) { b.style.display = 'block'; b.textContent = 'خطأ تقني: ' + msg; }
+    };
+
+    const SUPABASE_URL = 'https://rdbdfirmgatghmxdrmbp.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_BPJGaWqlyS6vw--_Ha1mGQ_2f4fT4cl';
+    const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+    const T = {
+      ar: { dir:'rtl', navHome:'الرئيسية', navLessons:'مكتبة الدروس', navEx:'التمارين والفروض', navSum:'ملخصات الدروس', navAi:'أستاذ مذاكر', navOcr:'قارئ الصور', navPlan:'تنظيم الوقت', navProg:'تقدم التلميذ', heroTitle:'مرحباً بك في مذاكر – المنصة التعليمية المغربية', heroDesc:'اختر مستواك الدراسي وفق المنهاج المغربي (من 1 ابتدائي إلى 2 باكالوريا) مجاناً بالكامل.', goBtn:'استكشف الدروس', chooseGrade:'اختيار المستوى الدراسي والشعبة', chooseTrack:'الشعبة / المسلك:', exTitle:'التمارين التفاعلية', pdfTitle:'الفروض والامتحانات (PDF)', protoTag:'نسخة تجريبية للمعاينة', empty:'لا توجد عناصر مضافة لهذا المستوى بعد.', allSub:'-- كل المواد --' },
+      fr: { dir:'ltr', navHome:'Accueil', navLessons:'Cours', navEx:'Exercices & Devoirs', navSum:'Résumés', navAi:'Prof Moudhakkir', navOcr:'Lecteur d’images', navPlan:'Temps', navProg:'Progression', heroTitle:'Bienvenue sur Moudhakkir – Programme Marocain', heroDesc:'Choisissez votre niveau scolaire (1AP au 2ème Bac) gratuitement.', goBtn:'Explorer les cours', chooseGrade:'Choisir le niveau scolaire', chooseTrack:'Filière :', exTitle:'Exercices interactifs', pdfTitle:'Devoirs & Examens (PDF)', protoTag:'Prototype démo (hors ligne)', empty:'Aucun contenu ajouté pour ce niveau.', allSub:'-- Toutes les matières --' },
+      ber:{ dir:'ltr', navHome:'ⴰⵎⵣⵡⴰⵔⵓ', navLessons:'ⵜⵉⵎⵙⵉⵔⵉⵏ', navEx:'ⵉⵍⵓⵖⵎⴰ ⴷ ⵉⵙⵉⵜⵏ', navSum:'ⵜⵉⴳⵣⴰⵍ', navAi:'ⴰⵙⵍⵎⴰⴷ ⵎⵓⴷⴰⴽⵉⵔ', navOcr:'ⴰⵎⵖⵔⴰⵢ ⵏ ⵜⵡⵍⴰⴼⵉⵏ', navPlan:'ⴰⴽⵓⴷ', navProg:'ⴰⵏⴼⵍⵓⵙ', heroTitle:'ⴱⵔⵔⴽⴰⵜ ⵖⵓⵔ ⵎⵓⴷⴰⴽⵉⵔ', heroDesc:'ⵙⵜⵉ ⴰⵙⵡⵉⵔ ⵏⵏⴽ ⴳ ⵓⵖⴰⵡⴰⵙ ⴰⵎⵖⵔⴰⴱⵉ ⴱⵍⴰ ⵜⵉⵖⵔⴰⴷ.', goBtn:'ⵜⵉⵎⵙⵉⵔⵉⵏ', chooseGrade:'ⵙⵜⵉ ⴰⵙⵡⵉⵔ ⵏ ⵜⵉⵖⵔⵉ', chooseTrack:'ⵜⴰⵣⵓⵏⵉ:', exTitle:'ⵉⵍⵓⵖⵎⴰ', pdfTitle:'ⵉⵙⵉⵜⵏ (PDF)', protoTag:'ⴰⵎⴷⵢⴰ ⴰⵔⵉⵎ', empty:'ⵓⵔ ⵜⵜⵓⵔⵏⵓⵏⵜ ⵜⵎⵙⵉⵔⵉⵏ ⵉ ⵓⵙⵡⵉⵔ ⴰⴷ ⵙⵓⵍ.', allSub:'-- ⵜⵉⵏⴳⴰⵡⵉⵏ ⵎⴰⵕⵕⴰ --' }
+    };
+
+    let st = { lang:'ar', cycle:'primary', grade:'1ap', track:'', read:[], solved:[] };
+    try { const s = localStorage.getItem('moudhakkir_stu'); if (s) st = { ...st, ...JSON.parse(s) }; } catch {}
+    const saveSt = () => { try { localStorage.setItem('moudhakkir_stu', JSON.stringify(st)); } catch {} };
+
+    let db = { cycles:[], grades:[], tracks:[], subjects:[], lessons:[] };
+    const esc = s => String(s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    const nm = o => o ? (o['name_'+st.lang] || o.name_ar || '') : '';
+
+    function go(id) {
+      document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById(id);
+      if (target) target.classList.add('active');
+      document.querySelectorAll('[data-go]').forEach(b => {
+        if (b.classList.contains('nav-btn') || b.parentElement.classList.contains('bnav')) {
+          b.classList.toggle('active', b.dataset.go === id);
+        }
+      });
+      window.scrollTo({ top:0, behavior:'smooth' });
+    }
+
+    function setLang(l) {
+      if (!T[l]) l = 'ar';
+      st.lang = l; saveSt();
+      document.documentElement.lang = l;
+      document.documentElement.dir = T[l].dir;
+      ['ar','fr','ber'].forEach(x => document.getElementById('la-'+x).classList.toggle('active', x===l));
+      document.querySelectorAll('[data-k]').forEach(el => { const k = el.dataset.k; if (T[l][k]) el.textContent = T[l][k]; });
+      renderUI(); loadContent();
+    }
+
+    document.addEventListener('click', function(e) {
+      const langBtn = e.target.closest('[data-lang]');
+      if (langBtn) { setLang(langBtn.dataset.lang); return; }
+      const goBtn = e.target.closest('[data-go]');
+      if (goBtn) { go(goBtn.dataset.go); return; }
+      const lesBtn = e.target.closest('[data-lesson-id]');
+      if (lesBtn) { openLesson(lesBtn.dataset.lessonId); return; }
+    });
+
+    document.getElementById('sub-filter').addEventListener('change', loadContent);
+    document.getElementById('m-close').addEventListener('click', () => document.getElementById('modal').classList.remove('open'));
+    document.getElementById('modal').addEventListener('click', e => { if (e.target.id === 'modal') e.target.classList.remove('open'); });
+    document.getElementById('chat-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const inp = document.getElementById('chat-q'), box = document.getElementById('chat-box');
+      box.innerHTML += `<div class="msg usr">${esc(inp.value)}</div>`; inp.value = '';
+      setTimeout(() => { box.innerHTML += `<div class="msg bot">رد تجريبي: هذه الواجهة للمعاينة فقط، وسيتم تفعيل الذكاء الاصطناعي الحقيقي لاحقاً.</div>`; box.scrollTop = box.scrollHeight; }, 250);
+    });
+    document.getElementById('ocr-file').addEventListener('change', function(e) {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = ev => { const img = document.getElementById('ocr-img'); img.src = ev.target.result; img.style.display = 'block'; document.getElementById('ocr-msg').style.display = 'block'; };
+      r.readAsDataURL(f);
+    });
+
+    let ps = 1500, pi = null;
+    document.getElementById('p-start').addEventListener('click', () => { if(pi) return; pi = setInterval(() => { if(ps>0){ ps--; document.getElementById('pomo').textContent = `${String(Math.floor(ps/60)).padStart(2,'0')}:${String(ps%60).padStart(2,'0')}`; } }, 1000); });
+    document.getElementById('p-pause').addEventListener('click', () => { clearInterval(pi); pi = null; });
+    document.getElementById('p-reset').addEventListener('click', () => { clearInterval(pi); pi = null; ps = 1500; document.getElementById('pomo').textContent = '25:00'; });
+
+    function renderUI() {
+      if (!db.cycles.length) return;
+      const cycBox = document.getElementById('cycles'); cycBox.innerHTML = '';
+      db.cycles.forEach(c => {
+        const b = document.createElement('button'); b.type = 'button';
+        b.className = 'pill ' + (st.cycle === c.id ? 'active' : '');
+        b.textConte
