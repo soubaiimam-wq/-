@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مذاكر – Moudhakkir</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&family=Noto+Sans+Tifinagh&display=swap" rel="stylesheet">
+<style>
+:root{--nv:#0B1F3A;--n2:#1B4578;--ns:#E8F0FA;--gr:#22C55E;--gs:#DCFCE7;--bg:#F4F7FB;--bd:#E2E8F0}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{max-width:100%;overflow-x:hidden}
+body{font-family:'Cairo','Noto Sans Tifinagh',sans-serif;background:var(--bg);color:#0F172A;line-height:1.5;padding-bottom:68px}
+header{background:#fff;border-bottom:1px solid var(--bd);padding:10px 12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:40}
+.langs{display:flex;gap:3px;background:var(--bg);padding:3px;border-radius:9px}
+.langs button{border:0;background:none;padding:6px 8px;border-radius:7px;font:700 .78rem inherit;cursor:pointer;color:#475569}
+.langs button.active{background:var(--nv);color:#fff}
+.wrap{max-width:980px;width:100%;margin:12px auto;padding:0 12px;display:grid;grid-template-columns:200px minmax(0,1fr);gap:14px}
+main,.card,.item,.modal-in{min-width:0;overflow-wrap:anywhere;word-break:break-word}
+aside{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:10px;height:fit-content}
+.nb{width:100%;display:flex;gap:7px;padding:9px;border:0;background:none;border-radius:9px;font:700 .9rem inherit;color:#475569;cursor:pointer;text-align:start;margin-bottom:2px}
+.nb.active{background:var(--nv);color:#fff}
+.hero{background:linear-gradient(135deg,var(--nv),var(--n2));color:#fff;padding:16px;border-radius:14px;margin-bottom:12px}
+.card{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(140px,100%),1fr));gap:8px}
+.item{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:10px;cursor:pointer}
+.pill{padding:6px 11px;border-radius:99px;border:1px solid var(--bd);background:var(--bg);font:700 .82rem inherit;cursor:pointer}
+.pill.active{background:var(--gr);color:var(--nv)}
+.btn{padding:8px 12px;border-radius:9px;border:0;font:700 .82rem inherit;cursor:pointer;text-decoration:none;display:inline-block}
+.bg{background:var(--gr);color:var(--nv)}.bn{background:var(--nv);color:#fff}
+.opt{display:block;width:100%;text-align:start;padding:8px;margin-top:5px;border-radius:8px;border:1px solid var(--bd);background:#fff;font:600 .86rem inherit;cursor:pointer}
+.opt.ok{background:var(--gs);border-color:#16A34A}.opt.no{background:#FEE2E2;border-color:#DC2626}
+.sec{display:none}.sec.active{display:block}
+.tag{display:inline-block;background:var(--ns);color:var(--nv);font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:99px;margin:2px}
+.wtag{display:inline-block;background:#FEF3C7;color:#92400E;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:99px}
+.sol{display:none;margin-top:8px;padding:10px;background:#fff;border-inline-start:3px solid var(--gr);border-radius:8px;font-size:.85rem;white-space:pre-line;line-height:1.7}
+.mbox{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.th{max-width:100%;max-height:240px;border-radius:10px;border:1px solid var(--bd);margin-top:8px;display:block}
+.ttr{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bd);gap:6px;font-size:.84rem;flex-wrap:wrap}
+table.st{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:8px}
+table.st th,table.st td{border:1px solid var(--bd);padding:6px;text-align:start}
+table.st th{background:var(--nv);color:#fff}
+.fover{display:none;position:fixed;inset:0;background:linear-gradient(160deg,#071426,#0B1F3A);color:#fff;z-index:200;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+.fover.on{display:flex}
+nav.bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--bd);justify-content:space-around;padding:6px 2px;z-index:50}
+nav.bnav button{flex:1;min-width:0;border:0;background:none;font:700 .66rem inherit;display:flex;flex-direction:column;align-items:center;color:#475569;cursor:pointer}
+nav.bnav button.active{color:var(--nv)}
+.modal{display:none;position:fixed;inset:0;background:rgba(11,31,58,.6);z-index:90;align-items:center;justify-content:center;padding:12px}
+.modal.open{display:flex}.modal-in{background:#fff;border-radius:14px;max-width:580px;width:100%;padding:16px;max-height:85vh;overflow-y:auto}
+footer{text-align:center;padding:12px;color:#475569;font-size:.8rem;border-top:1px solid var(--bd);background:#fff}
+@media(max-width:860px){.wrap{grid-template-columns:minmax(0,1fr)}aside{display:none}nav.bnav{display:flex}}
+</style>
+</head>
+<body>
+<header>
+<div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="go('s-home')">
+<svg width="32" height="32" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#0B1F3A"/><path d="M12 15h11v19H12z" fill="#fff"/><path d="M25 15h11v19H25z" fill="#4ADE80"/></svg>
+<div><strong style="color:var(--nv)">مذاكر – Moudhakkir</strong><br><small id="ag" style="color:#16A34A;font-weight:700">جاري التشغيل...</small></div>
+</div>
+<div class="langs"><button id="la-ar" class="active" onclick="setLang('ar')">العربية</button><button id="la-fr" onclick="setLang('fr')">Français</button><button id="la-ber" onclick="setLang('ber')">ⵜⴰⵎⴰⵣⵉⵖⵜ</button></div>
+</header>
+<div class="wrap">
+<aside>
+<button class="nb active" data-s="s-home" onclick="go('s-home')">🏠 <span data-k="n1">الرئيسية</span></button>
+<button class="nb" data-s="s-les" onclick="go('s-les')">📚 <span data-k="n2">الدروس</span></button>
+<button class="nb" data-s="s-ex" onclick="go('s-ex')">✍️ <span data-k="n3">التمارين والفروض</span></button>
+<button class="nb" data-s="s-sum" onclick="go('s-sum')">📝 <span data-k="n4">الملخصات</span></button>
+<button class="nb" data-s="s-ai" onclick="go('s-ai')">🤖 <span data-k="n5">أستاذ مذاكر</span></button>
+<button class="nb" data-s="s-ocr" onclick="go('s-ocr')">📷 <span data-k="n6">قارئ الصور والجدول</span></button>
+<button class="nb" data-s="s-plan" onclick="go('s-plan')">🎯 <span data-k="n7">وضع التركيز والوقت</span></button>
+<button class="nb" data-s="s-prog" onclick="go('s-prog')">📈 <span data-k="n8">تقدمي</span></button>
+</aside>
+<main>
+<div id="err" style="display:none;background:#FEE2E2;color:#7F1D1D;padding:9px;border-radius:9px;margin-bottom:9px"></div>
+<section id="s-home" class="sec active">
+<div class="hero">
+<h2 data-k="ht">مذاكر – المنصة التعليمية المغربية</h2>
+<p data-k="hd" style="margin:6px 0 10px;color:#DBEAFE">من 1 ابتدائي إلى 2 باكالوريا مجاناً بالكامل.</p>
+<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn bg" onclick="go('s-les')" data-k="gb">استكشف الدروس</button><button class="btn bn" style="border:1px solid #4ADE80" onclick="go('s-ai')">🤖 <span data-k="n5">أستاذ مذاكر</span></button><button class="btn bn" style="border:1px solid #fff" onclick="go('s-plan')">🎯 وضع التركيز</button></div>
+</div>
+<div class="card">
+<h3 style="margin-bottom:8px;color:var(--nv)" data-k="cg">اختيار المستوى والشعبة</h3>
+<div id="cyc" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px"></div>
+<div id="grd" class="grid"></div>
+<div id="trw" style="display:none;margin-top:8px"><strong data-k="ct">الشعبة:</strong><div id="trk" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px"></div></div>
+</div>
+<div class="grid">
+<div class="item" onclick="go('s-les')"><strong>📚 <span data-k="n2">الدروس</span></strong></div>
+<div class="item" onclick="go('s-ex')"><strong>✍️ <span data-k="n3">التمارين والفروض</span></strong></div>
+<div class="item" onclick="go('s-sum')"><strong>📝 <span data-k="n4">الملخصات</span></strong></div>
+<div class="item" style="border-color:var(--gr);background:var(--gs)" onclick="go('s-ai')"><strong>🤖 <span data-k="n5">أستاذ مذاكر</span></strong></div>
+<div class="item" onclick="go('s-ocr')"><strong>📷 <span data-k="n6">الجدول والمعاملات</span></strong></div>
+<div class="item" style="border-color:var(--nv);background:var(--ns)" onclick="go('s-plan')"><strong>🎯 <span data-k="n7">وضع التركيز</span></strong></div>
+<div class="item" onclick="go('s-prog')"><strong>📈 <span data-k="n8">تقدمي</span></strong></div>
+</div>
+</section>
+<section id="s-les" class="sec"><div class="card"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px"><h2 data-k="n2">الدروس</h2><select id="sf" onchange="loadC()" style="padding:6px;border-radius:8px;border:1px solid var(--bd)"></select></div><div id="lb" class="grid"></div></div></section>
+<section id="s-ex" class="sec"><div class="card"><h2 data-k="et" style="margin-bottom:8px">التمارين</h2><div id="eb"></div></div><div class="card"><h2 data-k="pt" style="margin-bottom:8px">الفروض PDF</h2><div id="exb" class="grid"></div></div></section>
+<section id="s-sum" class="sec"><div class="card"><h2 data-k="n4" style="margin-bottom:8px">الملخصات</h2><div id="sbx" class="grid"></div></div></section>
+<section id="s-ai" class="sec"><div class="card"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px"><h2>🤖 <span data-k="n5">أستاذ مذاكر</span></h2><span class="wtag">واجهة تجريبية (بانتظار ربط AI)</span></div><p style="font-size:.82rem;color:#475569;margin-bottom:8px">الأستاذ الذكي لمساعدتك في الدروس والتمارين وفق المنهاج المغربي (ردود المعاينة الحالية تجريبية فقط).</p><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px"><button class="pill" onclick="$('cq').value='اشرح لي درس الحسابيات';$('cf').requestSubmit()">شرح الحسابيات</button><button class="pill" onclick="$('cq').value='كيف أراجع للامتحان؟';$('cf').requestSubmit()">خطة المراجعة</button></div><div id="cb" style="background:var(--bg);border:1px solid var(--bd);border-radius:9px;padding:9px;height:160px;overflow-y:auto;margin-bottom:8px">مرحباً! أنا <b>أستاذ مذاكر</b> (واجهة تجريبية). اكتب سؤالك بالأسفل.</div><form id="cf" onsubmit="event.preventDefault();var q=$('cq');$('cb').innerHTML+='<div><b>أنت:</b> '+esc(q.value)+'</div><div style=color:#16A34A><b>أستاذ مذاكر (تجريبي):</b> سيتم تفعيل الإجابات الذكية الفعلية فور ربط الخادم بالذكاء الاصطناعي واختباره.</div>';q.value='';$('cb').scrollTop=$('cb').scrollHeight;" style="display:flex;gap:6px"><input id="cq" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--bd)" required placeholder="اكتب سؤالك..."><button class="btn bn">إرسال</button></form></div></section>
+<section id="s-ocr" class="sec">
+<div class="card"><h2>📷 قارئ استعمال الزمن المغربي ومخطط المعاملات</h2><span class="wtag">OCR التلقائي تجريبي • المخطط حسب المعاملات يعمل فعلياً</span><p style="font-size:.82rem;color:#475569;margin:6px 0">ارفع صورة استعمال زمانك المدرسي للمعاينة، ثم اضبط حصص مدرستك بالأسفل ليوزع التطبيق المراجعة <b>حسب سنتك ومعاملات موادك</b>.</p><input type="file" accept="image/*" onchange="var f=this.files[0];if(f){var r=new FileReader();r.onload=function(e){$('oi').src=e.target.result;$('oi').style.display='block';$('om').style.display='block'};r.readAsDataURL(f);}"><img id="oi" class="th" style="display:none"><p id="om" style="display:none;font-size:.8rem;color:#16A34A;margin-top:5px">✓ تم عرض صورة جدولك (OCR التلقائي سيُربط لاحقاً). اضبط حصصك:</p></div>
+<div class="card"><h3 style="color:var(--nv);margin-bottom:4px">📊 معاملات مستواك: <span id="coef-lbl" style="color:#16A34A"></span></h3><div id="coef-tags" style="margin-bottom:8px"></div><div id="tti"></div><button class="btn bg" style="margin-top:8px;width:100%" onclick="mkPlan()">بناء مخطط المراجعة حسب سنتي ومعاملاتي ✓</button><div id="tto"></div></div>
+</section>
+<section id="s-plan" class="sec">
+<div class="card"><h2>🎯 وضع التركيز العميق</h2><div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0"><button class="pill active" onclick="setFoc(25,this)">25 د</button><button class="pill" onclick="setFoc(45,this)">45 د</button><button class="pill" onclick="setFoc(5,this)">5 د راحة</button></div><div id="pm" style="font-size:2.3rem;font-weight:800;color:var(--nv);margin:8px 0">25:00</div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn bg" onclick="startP()">ابدأ</button><button class="btn bn" onclick="pauseP()">إيقاف</button><button class="btn" style="border:1px solid var(--bd)" onclick="resetP()">إعادة</button><button class="btn bn" style="background:#0F766E" onclick="$('fover').classList.add('on')">🖥️ شاشة التركيز الكاملة</button></div></div>
+<div class="card"><h3>📅 مخطط المراجعة الأسبوعي</h3><div id="pmr"></div></div>
+</section>
+<section id="s-prog" class="sec"><div class="card"><h2>📈 <span data-k="n8">تقدمي</span></h2><p id="pgt" style="margin-top:8px;font-weight:700"></p></div></section>
+</main>
+</div>
+<div class="fover" id="fover"><span class="tag" style="background:#22C55E;color:#0B1F3A">🎯 وضع التركيز مفعّل</span><h2 style="margin-top:10px" id="flbl">ركّز في مراجعتك بدون مشتتات</h2><div id="fpm" style="font-size:4rem;font-weight:800;margin:18px 0;color:#4ADE80">25:00</div><div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="btn bg" onclick="startP()">ابدأ / استمر</button><button class="btn bn" style="border:1px solid #fff" onclick="pauseP()">إيقاف</button><button class="btn" style="background:#DC2626;color:#fff" onclick="$('fover').classList.remove('on')">خروج</button></div></div>
+<div class="modal" id="md" onclick="if(event.target.id==='md')this.className='modal'"><div class="modal-in"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><h3 id="mt"></h3><button class="btn" onclick="$('md').className='modal'">✕</button></div><div id="mm" class="mbox"></div><img id="mi" class="th" style="display:none"><div id="mb" style="white-space:pre-line;line-height:1.8;margin-top:8px"></div><div id="mm2" class="mbox"></div></div></div>
+<nav class="bnav"><button class="active" data-s="s-home" onclick="go('s-home')">🏠<span>الرئيسية</span></button><button data-s="s-les" onclick="go('s-les')">📚<span>الدروس</span></button><button data-s="s-ai" onclick="go('s-ai')">🤖<span>الأستاذ</span></button><button data-s="s-ocr" onclick="go('s-ocr')">📷<span>المخطط</span></button><button data-s="s-plan" onclick="go('s-plan')">🎯<span>التركيز</span></button></nav>
+<footer>مذاكر – Moudhakkir • مجاني 100% • <a href="./admin.html" style="color:var(--n2)">دخول المطور</a></footer>
+<script>
+function $(i){return document.getElementById(i)}
+var baseSec=1500,ps=1500,pi=null,st={lang:'ar',cycle:'primary',grade:'1ap',track:'',read:[],solved:[],busy:{}},db={cycles:[],grades:[],tracks:[],subjects:[],lessons:[]};
+try{var sv=localStorage.getItem('mk_st');if(sv)st=Object.assign(st,JSON.parse(sv))}catch(e){}
+function saveSt(){try{localStorage.setItem('mk_st',JSON.stringify(st))}catch(e){}}
+var T={
+ar:{dir:'rtl',n1:'الرئيسية',n2:'الدروس',n3:'التمارين والفروض',n4:'الملخصات',n5:'أستاذ مذاكر',n6:'قارئ الصور والجدول',n7:'وضع التركيز والوقت',n8:'تقدمي',ht:'مذاكر – المنصة التعليمية المغربية',hd:'من 1 ابتدائي إلى 2 باكالوريا مجاناً بالكامل.',gb:'استكشف الدروس',cg:'اختيار المستوى والشعبة',ct:'الشعبة:',et:'التمارين',pt:'الفروض PDF',emp:'لا توجد عناصر مضافة لهذا المستوى بعد.',all:'-- كل المواد --',mcq:'🎯 سؤال اختياري',wr:'✍️ تمرين تحريري',sol:'إظهار الحل المفصل ✓'},
+fr:{dir:'ltr',n1:'Accueil',n2:'Cours',n3:'Exercices & Devoirs',n4:'Résumés',n5:'Prof IA',n6:'Emploi & Coefs',n7:'Mode Focus',n8:'Progrès',ht:'Moudhakkir – Programme Marocain',hd:'De la 1ère AP au 2ème Bac gratuitement.',gb:'Explorer les cours',cg:'Choisir le niveau',ct:'Filière :',et:'Exercices',pt:'Devoirs PDF',emp:'Aucun contenu pour ce niveau.',all:'-- Toutes --',mcq:'🎯 QCM',wr:'✍️ Exercice écrit',sol:'Voir la correction ✓'},
+ber:{dir:'ltr',n1:'ⴰⵎⵣⵡⴰⵔⵓ',n2:'ⵜⵉⵎⵙⵉⵔⵉⵏ',n3:'ⵉⵍⵓⵖⵎⴰ',n4:'ⵜⵉⴳⵣⴰⵍ',n5:'ⴰⵙⵍⵎⴰⴷ',n6:'ⴰⵖⴰⵡⴰⵙ',n7:'ⴰⴽⵓⴷ',n8:'ⴰⵏⴼⵍⵓⵙ',ht:'ⵎⵓⴷⴰⴽⵉⵔ – ⴰⵖⴰⵡⴰⵙ ⴰⵎⵖⵔⴰⴱⵉ',hd:'ⵙⴳ ⵓⵎⵏⵣⵓ ⴰⵔ ⵍⴱⴰⴽⴰⵍⵓⵔⵢⴰ.',gb:'ⵜⵉⵎⵙⵉⵔⵉⵏ',cg:'ⵙⵜⵉ ⴰⵙⵡⵉⵔ',ct:'ⵜⴰⵣⵓⵏⵉ:',et:'ⵉⵍⵓⵖⵎⴰ',pt:'ⵉⵙⵉⵜⵏ PDF',emp:'ⵓⵔ ⵍⵍⵉⵏⵜ ⵜⵎⵙⵉⵔⵉⵏ ⵙⵓⵍ.',all:'-- ⵎⴰⵕⵕⴰ --',mcq:'🎯 QCM',wr:'✍️ ⴰⵍⵓⵖⵎⵓ',sol:'ⵙⴽⵏ ⴰⴼⵙⵙⴰⵢ ✓'}
+};
+var COEFS={primary:[['الرياضيات',3],['العربية',3],['الفرنسية',3],['النشاط العلمي',2],['الإسلاميات/اجتماعيات',1]],middle:[['الرياضيات',3],['العربية',3],['الفرنسية',3],['الفيزياء',2],['ع.ح.أ',2],['اجتماعيات/إسلاميات',2]],'tc-sci':[['الرياضيات',4],['الفيزياء والكيمياء',4],['ع.ح.أ',4],['الفرنسية',3],['العربية/إنجليزية/فلسفة',2]],'tc-lit':[['العربية',4],['الفرنسية',4],['اجتماعيات',3],['إنجليزية',3],['فلسفة/رياضيات',2]],'1bac-se':[['الرياضيات',7],['الفيزياء',7],['ع.ح.أ',5],['الفرنسية (جهوي)',4],['مواد الجهوي',2]],'1bac-sm':[['الرياضيات',9],['الفيزياء',7],['الفرنسية (جهوي)',4],['ع.ح.أ',3],['مواد الجهوي',2]],'1bac-lit':[['العربية',4],['الفرنسية',4],['اجتماعيات',4],['إنجليزية',3],['رياضيات/إسلاميات',2]],'2bac-pc':[['الفيزياء والكيمياء',7],['الرياضيات',7],['ع.ح.أ',5],['الإنجليزية',2],['الفلسفة',2]],'2bac-svt':[['ع.ح.أ',7],['الرياضيات',7],['الفيزياء',5],['الإنجليزية',2],['الفلسفة',2]],'2bac-sm':[['الرياضيات',9],['الفيزياء',7],['ع.ح.أ/م',3],['الإنجليزية',2],['الفلسفة',2]],'2bac-eco':[['المحاسبة',6],['الاقتصاد',6],['الرياضيات',4],['الإنجليزية',2],['الفلسفة',2]],'2bac-sh':[['العربية',4],['الفلسفة',4],['الاجتماعيات',4],['الإنجليزية',4],['الرياضيات',1]]};
+function getCoefs(){if(st.track&&COEFS[st.track])return COEFS[st.track];if(st.cycle==='primary')return COEFS.primary;if(st.cycle==='middle')return COEFS.middle;return COEFS['tc-sci']}
+function showCoefs(){var l=getCoefs(),ag=db.grades.find(function(g){return g.id===st.grade}),tr=db.tracks.find(function(t){return t.id===st.track});$('coef-lbl').textContent=(tr?nm(tr):(ag?nm(ag):''));$('coef-tags').innerHTML=l.map(function(x){return'<span class="tag">'+x[0]+' (معامل '+x[1]+')</span>'}).join('')}
+function esc(s){return String(s||'').replace(/[&<>"']/g,function(m){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]})}
+function nm(o){return o?(o['name_'+st.lang]||o.name_ar||''):''}
+function go(id){document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('active')});var t=$(id);if(t)t.classList.add('active');document.querySelectorAll('.nb,nav.bnav button').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-s')===id)});window.scrollTo(0,0)}
+function setLang(l){st.lang=T[l]?l:'ar';saveSt();document.documentElement.lang=st.lang;document.documentElement.dir=T[st.lang].dir;['ar','fr','ber'].forEach(function(x){$('la-'+x).classList.toggle('active',x===st.lang)});document.querySelectorAll('[data-k]').forEach(function(el){var k=el.getAttribute('data-k');if(T[st.lang][k])el.textContent=T[st.lang][k]});renderUI();loadC()}
+function renderUI(){
+var gObj=db.grades.find(function(g){return g.id===st.grade});$('ag').textContent=gObj?nm(gObj):'جاهز ✓';
+if(!db.cycles.length){showCoefs();return}
+$('cyc').innerHTML='';db.cycles.forEach(function(c){var b=document.createElement('button');b.className='pill'+(st.cycle===c.id?' active':'');b.textContent=nm(c);b.onclick=function(){st.cycle=c.id;var f=db.grades.find(function(g){return g.cycle_id===c.id});if(f)st.grade=f.id;st.track='';saveSt();renderUI();loadC()};$('cyc').appendChild(b)});
+$('grd').innerHTML='';db.grades.filter(function(g){return g.cycle_id===st.cycle}).forEach(function(g){var d=document.createElement('div');d.className='item';if(st.grade===g.id)d.style.cssText='border-color:var(--nv);background:var(--ns)';d.innerHTML='<strong>'+esc(nm(g))+'</strong>';d.onclick=function(){st.grade=g.id;st.track='';saveSt();renderUI();loadC()};$('grd').appendChild(d)});
+var trs=db.tracks.filter(function(t){return t.grade_id===st.grade});$('trk').innerHTML='';
+if(trs.length){$('trw').style.display='block';if(!st.track||!trs.some(function(x){return x.id===st.track}))st.track=trs[0].id;trs.forEach(function(t){var b=document.createElement('button');b.className='pill'+(st.track===t.id?' active':'');
