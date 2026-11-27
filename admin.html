@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة المطور | مذاكر</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root{--navy:#0B1F3A;--green:#22C55E;--bg:#F4F7FB;--border:#E2E8F0}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Cairo',sans-serif;background:var(--bg);color:#0F172A;line-height:1.6}
+    header{background:var(--navy);color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+    .wrap{max-width:900px;margin:18px auto;padding:0 14px 50px}
+    .card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:16px}
+    label{display:block;font-weight:700;font-size:.85rem;margin-bottom:4px;color:var(--navy)}
+    input,select,textarea{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;font-family:inherit;margin-bottom:10px;background:#fff}
+    textarea{min-height:85px}
+    .btn{border:none;padding:10px 16px;border-radius:10px;font-family:inherit;font-weight:700;cursor:pointer}
+    .btn-navy{background:var(--navy);color:#fff}.btn-green{background:var(--green);color:var(--navy)}.btn-red{background:#DC2626;color:#fff}
+    .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+    .tab-btn{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:#fff;font-family:inherit;font-weight:700;cursor:pointer}
+    .tab-btn.active{background:var(--navy);color:#fff}
+    .pane{display:none}.pane.active{display:block}
+    .msg{padding:10px;border-radius:10px;margin-bottom:12px;font-weight:700;display:none}
+    .msg.ok{display:block;background:#DCFCE7;color:#14532D}.msg.err{display:block;background:#FEE2E2;color:#7F1D1D}
+  </style>
+</head>
+<body>
+  <header>
+    <strong>🔐 لوحة المطور الوحيد – مذاكر</strong>
+    <div style="display:flex;gap:8px">
+      <a href="./index.html" class="btn btn-green" style="text-decoration:none">موقع التلاميذ ↗</a>
+      <button id="btn-logout" class="btn btn-red" style="display:none" onclick="logout()">خروج</button>
+    </div>
+  </header>
+  <div class="wrap">
+    <div id="login-box" class="card" style="display:none;max-width:420px;margin:30px auto">
+      <h2 style="margin-bottom:12px;color:var(--navy)">دخول المطور الوحيد</h2>
+      <div id="login-msg" class="msg"></div>
+      <form onsubmit="login(event)">
+        <label>البريد الإلكتروني</label><input type="email" id="email" value="soubaiimam@gmail.com" required />
+        <label>كلمة المرور</label><input type="password" id="password" required />
+        <button class="btn btn-navy" style="width:100%" type="submit">دخول</button>
+      </form>
+    </div>
+    <div id="work-box" style="display:none">
+      <div id="global-msg" class="msg"></div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('p-lesson',this)">📚 درس (PDF/صورة)</button>
+        <button class="tab-btn" onclick="openTab('p-summary',this)">📝 ملخص (PDF/صورة)</button>
+        <button class="tab-btn" onclick="openTab('p-exercise',this)">✍️ تمرين (PDF/صورة)</button>
+        <button class="tab-btn" onclick="openTab('p-exam',this)">📄 فرض PDF</button>
+        <button class="tab-btn" onclick="openTab('p-manage',this)">🗂️ إدارة</button>
+      </div>
+
+      <div id="p-lesson" class="pane active card">
+        <h3 style="margin-bottom:10px">إضافة درس (نص / PDF / صورة)</h3>
+        <form onsubmit="addLesson(event)">
+          <label>المستوى</label><select id="l-grade" onchange="fillTracks('l-grade','l-track')"></select>
+          <label>الشعبة (للتأهيلي)</label><select id="l-track"></select>
+          <label>المادة</label><select id="l-subject"></select>
+          <label>الدورة</label><select id="l-sem"><option value="1">الأولى</option><option value="2">الثانية</option></select>
+          <label>عنوان الدرس بالعربية*</label><input id="l-t-ar" required />
+          <label>العنوان بالفرنسية (اختياري)</label><input id="l-t-fr" dir="ltr" />
+          <label>العنوان بالأمازيغية (اختياري)</label><input id="l-t-ber" dir="ltr" />
+          <label>📄 ملف الدرس (PDF - اختياري)</label><input type="file" id="l-pdf" accept="application/pdf" />
+          <label>🖼️ صورة الدرس (اختياري)</label><input type="file" id="l-img" accept="image/*" />
+          <label>محتوى الدرس نصياً (اختياري إذا رفعت PDF أو صورة)</label><textarea id="l-c-ar"></textarea>
+          <label>محتوى الدرس بالفرنسية (اختياري)</label><textarea id="l-c-fr" dir="ltr"></textarea>
+          <button class="btn btn-green" type="submit">حفظ الدرس ✓</button>
+        </form>
+      </div>
+
+      <div id="p-summary" class="pane card">
+        <h3 style="margin-bottom:10px">إضافة ملخص (نقاط / صورة / PDF)</h3>
+        <form onsubmit="addSummary(event)">
+          <label>اختر الدرس</label><select id="s-lesson" required></select>
+          <label>عنوان الملخص بالعربية*</label><input id="s-t-ar" required />
+          <label>عنوان الملخص بالفرنسية (اختياري)</label><input id="s-t-fr" dir="ltr" />
+          <label>📄 ملف الملخص (PDF - اختياري)</label><input type="file" id="s-pdf" accept="application/pdf" />
+          <label>🖼️ صورة خطاطة أو ملخص (اختياري)</label><input type="file" id="s-img" accept="image/*" />
+          <label>نقاط الملخص (اختياري — كل نقطة في سطر)</label><textarea id="s-pts"></textarea>
+          <button class="btn btn-green" type="submit">حفظ الملخص ✓</button>
+        </form>
+      </div>
+
+      <div id="p-exercise" class="pane card">
+        <h3 style="margin-bottom:10px">إضافة تمرين (نص / PDF / صورة)</h3>
+        <form onsubmit="addExercise(event)">
+          <label>اختر الدرس</label><select id="ex-lesson" required></select>
+          <label>نوع التمرين</label>
+          <select id="ex-type" onchange="toggleExType()">
+            <option value="written">✍️ تمرين تحريري بدون اختيارات (أو صورة / PDF)</option>
+            <option value="mcq">🎯 سؤال اختباري بالاختيارات (QCM)</option>
+          </select>
+          <label>📄 ملف سلسلة تمارين (PDF - اختياري)</label><input type="file" id="ex-pdf" accept="application/pdf" />
+          <label>🖼️ صورة التمرين (اختياري)</label><input type="file" id="ex-img" accept="image/*" />
+          <label>نص التمرين (اختياري إذا رفعت صورة أو PDF)</label><textarea id="ex-q-ar"></textarea>
+          <label>السؤال بالفرنسية (اختياري)</label><input id="ex-q-fr" dir="ltr" />
+          <div id="mcq-fields" style="display:none">
+            <label>الاختيار 1</label><input id="ex-o1" />
+            <label>الاختيار 2</label><input id="ex-o2" />
+            <label>الاختيار 3</label><input id="ex-o3" />
+            <label>الإجابة الصحيحة</label>
+            <select id="ex-ok"><option value="0">الاختيار 1</option><option value="1">الاختيار 2</option><option value="2">الاختيار 3</option></select>
+          </div>
+          <label>الحل المفصل / التصحيح (اختياري)</label><textarea id="ex-exp"></textarea>
+          <button class="btn btn-green" type="submit">حفظ التمرين ✓</button>
+        </form>
+      </div>
+
+      <div id="p-exam" class="pane card">
+        <h3 style="margin-bottom:10px">رفع فرض / امتحان PDF</h3>
+        <form onsubmit="addExam(event)">
+          <label>المستوى</label><select id="e-grade" onchange="fillTracks('e-grade','e-track')"></select>
+          <label>الشعبة</label><select id="e-track"></select>
+          <label>المادة</label><select id="e-subject"></select>
+          <label>النوع</label>
+          <select id="e-cat"><option value="devoir_1">فرض 1</option><option value="devoir_2">فرض 2</option><option value="regional">جهوي</option><option value="national">وطني</option></select>
+          <label>العنوان بالعربية*</label><input id="e-t-ar" required />
+          <label>السنة</label><input type="number" id="e-year" placeholder="2026" />
+          <label>ملف الموضوع (PDF)</label><input type="file" id="e-pdf1" accept="application/pdf" />
+          <label>ملف التصحيح (PDF)</label><input type="file" id="e-pdf2" accept="application/pdf" />
+          <button class="btn btn-green" type="submit">رفع وحفظ الفرض ✓</button>
+        </form>
+      </div>
+
+      <div id="p-manage" class="pane card">
+        <button class="btn btn-red" style="margin-bottom:12px" onclick="clearDemo()">حذف المحتوى التجريبي</button>
+        <h4 style="margin:10px 0">الدروس</h4><div id="manage-lessons"></div>
+        <h4 style="margin:14px 0 10px">الفروض والامتحانات</h4><div id="manage-exams"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const SUPABASE_URL='https://rdbdfirmgatghmxdrmbp.supabase.co';
+    const SUPABASE_KEY='sb_publishable_BPJGaWqlyS6vw--_Ha1mGQ_2f4fT4cl';
+    const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+    const esc=s=>String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    let meta={grades:[],tracks:[],subjects:[]};
+    function msg(id,txt,ok=true){const el=document.getElementById(id);el.textContent=txt;el.className='msg '+(ok?'ok':'err');setTimeout(()=>el.className='msg',5000)}
+    function openTab(id,btn){document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById(id).classList.add('active');btn.classList.add('active')}
+    function toggleExType(){document.getElementById('mcq-fields').style.display=document.getElementById('ex-type').value==='mcq'?'block':'none'}
+    async function checkSession(){
+      const{data:{session}}=await sb.auth.getSession();
+      if(session){document.getElementById('login-box').style.display='none';document.getElementById('work-box').style.display='block';document.getElementById('btn-logout').style.display='inline-block';await loadMeta();}
+      else{document.getElementById('login-box').style.display='block';document.getElementById('work-box').style.display='none';}
+    }
+    async function login(e){e.preventDefault();const{error}=await sb.auth.signInWithPassword({email:document.getElementById('email').value.trim(),password:document.getElementById('password').value});if(error)msg('login-msg',error.message,false);else checkSession();}
+    async function logout(){await sb.auth.signOut();location.reload()}
+    async function loadMeta(){
+      const[g,t,s]=await Promise.all([sb.from('grades').select('*').order('order_index'),sb.from('tracks').select('*'),sb.from('subjects').select('*')]);
+      meta={grades:g.data||[],tracks:t.data||[],subjects:s.data||[]};
+      ['l-grade','e-grade'].forEach(id=>document.getElementById(id).innerHTML=meta.grades.map(x=>`<option value="${x.id}">${esc(x.name_ar)}</option>`).join(''));
+      ['l-subject','e-subject'].forEach(id=>document.getElementById(id).innerHTML=meta.subjects.map(x=>`<option value="${x.id}">${esc(x.name_ar)}</option>`).join(''));
+      fillTracks('l-grade','l-track');fillTracks('e-grade','e-track');await refreshManage();
+    }
+    function fillTracks(gId,tId){
+      const gid=document.getElementById(gId).value,list=meta.tracks.filter(t=>t.grade_id===gid);
+      document.getElementById(tId).innerHTML=list.length?list.map(t=>`<option value="${t.id}">${esc(t.name_ar)}</option>`).join(''):'<option value="">-- مشترك بدون شعبة --</option>';
+    }
+    async function getOrCreateCS(gradeId,trackId,subjectId){
+      let q=sb.from('curriculum_subjects').select('id').eq('grade_id',gradeId).eq('subject_id',subjectId);
+      q=trackId?q.eq('track_id',trackId):q.is('track_id',null);
+      const{data}=await q;if(data&&data.length)return data[0].id;
+      const ins=await sb.from('curriculum_subjects').insert({grade_id:gradeId,track_id:trackId||null,subject_id:subjectId}).select('id').single();
+      if(ins.error)throw ins.error;return ins.data.id;
+    }
+    async function refreshManage(){
+      const[les,exm]=await Promise.all([sb.from('lessons').select('id,title_ar,is_demo').order('created_at',{ascending:false}),sb.from('exams').select('id,title_ar').order('created_at',{ascending:false})]);
+      const lessons=les.data||[];
+      const opts=lessons.map(l=>`<option value="${l.id}">${esc(l.title_ar)}</option>`).join('')||'<option value="">أضف درساً أولاً</option>';
+      document.getElementById('s-lesson').innerHTML=opts;document.getElementById('ex-lesson').innerHTML=opts;
+      document.getElementById('manage-lessons').innerHTML=lessons.map(l=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)"><span>${esc(l.title_ar)} ${l.is_demo?'(تجريبي)':''}</span><button class="btn btn-red" style="padding:4px 10px" onclick="delLesson('${l.id}')">حذف</button></div>`).join('')||'<p>لا توجد دروس.</p>';
+      document.getElementById('manage-exams').innerHTML=(exm.data||[]).map(e=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)"><span>${esc(e.title_ar)}</span><button class="btn btn-red" style="padding:4px 10px" onclick="delExam('${e.id}')">حذف</button></div>`).join('')||'<p>لا توجد فروض.</p>';
+    }
+    async function uploadFile(file){
+      if(!file)return null;
+      const ext=file.name.split('.').pop().toLowerCase();
+      const path=`${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+      const{error}=await sb.storage.from('moudhakkir-files').upload(path,file);
+      if(error)throw error;
+      return sb.storage.from('moudhakkir-files').getPublicUrl(path).data.publicUrl;
+    }
+    async function addLesson(e){
+      e.preventDefault();
+      try{
+        const pdfF=document.getElementById('l-pdf').files[0],imgF=document.getElementById('l-img').files[0],txt=document.getElementById('l-c-ar').value.trim();
+        if(!pdfF&&!imgF&&!txt){msg('global-msg','أضف نصاً أو ملف PDF أو صورة.',false);return}
+        msg('global-msg','جاري الحفظ والرفع...');
+        const[pdfUrl,imgUrl]=await Promise.all([uploadFile(pdfF),uploadFile(imgF)]);
+        const csId=await getOrCreateCS(document.getElementById('l-grade').value,document.getElementById('l-track').value,document.getElementById('l-subject').value);
+        const{error}=await sb.from('lessons').insert({
+          curriculum_subject_id:csId,semester:Number(document.getElementById('l-sem').value),
+          title_ar:document.getElementById('l-t-ar').value,title_fr:document.getElementById('l-t-fr').value||null,title_ber:document.getElementById('l-t-ber').value||null,
+          content_ar:txt||'درس مرفق بصيغة ملف (PDF / صورة) بالأسفل.',content_fr:document.getElementById('l-c-fr').value||null,
+          pdf_url:pdfUrl,image_url:imgUrl,status:'published',is_demo:false
+        });
+        if(error)throw error;e.target.reset();msg('global-msg','تم حفظ الدرس بنجاح!');refreshManage();
+      }catch(err){msg('global-msg',err.message,false)}
+    }
+    async function addSummary(e){
+      e.preventDefault();
+      try{
+        msg('global-msg','جاري الحفظ والرفع...');
+        const[pdfUrl,imgUrl]=await Promise.all([uploadFile(document.getElementById('s-pdf').files[0]),uploadFile(document.getElementById('s-img').files[0])]);
+        const pts=document.getElementById('s-pts').value.split('\n').map(x=>x.trim()).filter(Boolean).map(x=>({ar:x,fr:x}));
+        const{error}=await sb.from('summaries').insert({lesson_id:document.getElementById('s-lesson').value,title_ar:document.getElementById('s-t-ar').value,title_fr:document.getElementById('s-t-fr').value||null,key_points:pts,mindmap_url:imgUrl,pdf_url:pdfUrl,is_demo:false});
+        if(error)throw error;e.target.reset();msg('global-msg','تم حفظ الملخص بنجاح!');
+      }catch(err){msg('global-msg',err.message,false)}
+    }
+    async function addExercise(e){
+      e.preventDefault();
+      try{
+        const type=document.getElementById('ex-type').value,pdfF=document.getElementById('ex-pdf').files[0],imgF=document.getElementById('ex-img').files[0],qAr=document.getElementById('ex-q-ar').value.trim();
+        if(!pdfF&&!imgF&&!qAr){msg('global-msg','أضف نص التمرين أو ملف PDF أو صورة.',false);return}
+        msg('global-msg','جاري الحفظ والرفع...');
+        const[pdfUrl,imgUrl]=await Promise.all([uploadFile(pdfF),uploadFile(imgF)]);
+        let opts=[];
+        if(type==='mcq'){
+          const ok=Number(document.getElementById('ex-ok').value);
+          opts=[document.getElementById('ex-o1').value,document.getElementById('ex-o2').value,document.getElementById('ex-o3').value].filter(x=>x.trim()).map((t,i)=>({id:String(i),text_ar:t,text_fr:t,is_correct:i===ok}));
+        }
+        const{error}=await sb.from('exercises').insert({lesson_id:document.getElementById('ex-lesson').value,question_type:type,question_ar:qAr||'تمرين مرفق بالصورة / PDF:',question_fr:document.getElementById('ex-q-fr').value||null,options:opts,explanation_ar:document.getElementById('ex-exp').value||null,pdf_url:pdfUrl,image_url:imgUrl,is_demo:false});
+        if(error)throw error;e.target.reset();toggleExType();msg('global-msg','تم حفظ التمرين بنجاح!');
+      }catch(err){msg('global-msg',err.message,false)}
+    }
+    async function addExam(e){
+      e.preventDefault();
+      try{
+        msg('global-msg','جاري رفع الملفات...');
+        const csId=await getOrCreateCS(document.getElementById('e-grade').value,document.getElementById('e-track').value,document.getElementById('e-subject').value);
+        const[p1,p2]=await Promise.all([uploadFile(document.getElementById('e-pdf1').files[0]),uploadFile(document.getElementById('e-pdf2').files[0])]);
+        const{error}=await sb.from('exams').insert({curriculum_subject_id:csId,exam_category:document.getElementById('e-cat').value,title_ar:document.getElementById('e-t-ar').value,exam_year:Number(document.getElementById('e-year').value)||null,subject_pdf_url:p1,correction_pdf_url:p2,is_demo:false});
+        if(error)throw error;e.target.reset();msg('global-msg','تم رفع PDF وحفظ الفرض!');refreshManage();
+      }catch(err){msg('global-msg',err.message,false)}
+    }
+    async function delLesson(id){if(confirm('حذف الدرس؟')){await sb.from('lessons').delete().eq('id',id);refreshManage()}}
+    async function delExam(id){if(confirm('حذف الفرض؟')){await sb.from('exams').delete().eq('id',id);refreshManage()}}
+    async function clearDemo(){if(!confirm('حذف التجريبي؟'))return;await sb.from('lessons').delete().eq('is_demo',true);await sb.from('exams').delete().eq('is_demo',true);refreshManage();msg('global-msg','تم تنظيف التجريبي!')}
+    checkSession();
+  </script>
+</body>
+              </html>
