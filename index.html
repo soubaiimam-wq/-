@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مذاكر – Moudhakkir</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&family=Noto+Sans+Tifinagh&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header>
+<div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="go('s-home')">
+<svg width="32" height="32" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#0B1F3A"/><path d="M12 15h11v19H12z" fill="#fff"/><path d="M25 15h11v19H25z" fill="#4ADE80"/></svg>
+<div><strong style="color:var(--nv)">مذاكر – Moudhakkir</strong><br><small id="ag" style="color:#16A34A;font-weight:700">جاري التشغيل...</small></div>
+</div>
+<div class="langs"><button id="la-ar" class="active" onclick="setLang('ar')">العربية</button><button id="la-fr" onclick="setLang('fr')">Français</button><button id="la-ber" onclick="setLang('ber')">ⵜⴰⵎⴰⵣⵉⵖⵜ</button></div>
+</header>
+<div class="wrap">
+<aside>
+<button class="nb active" data-s="s-home" onclick="go('s-home')">🏠 <span data-k="n1">الرئيسية</span></button>
+<button class="nb" data-s="s-les" onclick="go('s-les')">📚 <span data-k="n2">الدروس</span></button>
+<button class="nb" data-s="s-ex" onclick="go('s-ex')">✍️ <span data-k="n3">التمارين والفروض</span></button>
+<button class="nb" data-s="s-sum" onclick="go('s-sum')">📝 <span data-k="n4">الملخصات</span></button>
+<button class="nb" data-s="s-ai" onclick="go('s-ai')">🤖 <span data-k="n5">أستاذ مذاكر</span></button>
+<button class="nb" data-s="s-ocr" onclick="go('s-ocr')">📷 <span data-k="n6">قارئ الصور والجدول</span></button>
+<button class="nb" data-s="s-plan" onclick="go('s-plan')">🎯 <span data-k="n7">وضع التركيز والوقت</span></button>
+<button class="nb" data-s="s-prog" onclick="go('s-prog')">📈 <span data-k="n8">تقدمي</span></button>
+</aside>
+<main>
+<div id="err" style="display:none;background:#FEE2E2;color:#7F1D1D;padding:9px;border-radius:9px;margin-bottom:9px"></div>
+<section id="s-home" class="sec active">
+<div class="hero">
+<h2 data-k="ht">مذاكر – المنصة التعليمية المغربية</h2>
+<p data-k="hd" style="margin:6px 0 10px;color:#DBEAFE">من 1 ابتدائي إلى 2 باكالوريا مجاناً بالكامل.</p>
+<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn bg" onclick="go('s-les')" data-k="gb">استكشف الدروس</button><button class="btn bn" style="border:1px solid #4ADE80" onclick="go('s-ai')">🤖 <span data-k="n5">أستاذ مذاكر</span></button><button class="btn bn" style="border:1px solid #fff" onclick="go('s-plan')">🎯 وضع التركيز</button></div>
+</div>
+<div class="card">
+<h3 style="margin-bottom:8px;color:var(--nv)" data-k="cg">اختيار المستوى والشعبة</h3>
+<div id="cyc" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px"></div>
+<div id="grd" class="grid"></div>
+<div id="trw" style="display:none;margin-top:8px"><strong data-k="ct">الشعبة:</strong><div id="trk" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px"></div></div>
+</div>
+<div class="grid">
+<div class="item" onclick="go('s-les')"><strong>📚 <span data-k="n2">الدروس</span></strong></div>
+<div class="item" onclick="go('s-ex')"><strong>✍️ <span data-k="n3">التمارين والفروض</span></strong></div>
+<div class="item" onclick="go('s-sum')"><strong>📝 <span data-k="n4">الملخصات</span></strong></div>
+<div class="item" style="border-color:var(--gr);background:var(--gs)" onclick="go('s-ai')"><strong>🤖 <span data-k="n5">أستاذ مذاكر</span></strong></div>
+<div class="item" onclick="go('s-ocr')"><strong>📷 <span data-k="n6">الجدول والمعاملات</span></strong></div>
+<div class="item" style="border-color:var(--nv);background:var(--ns)" onclick="go('s-plan')"><strong>🎯 <span data-k="n7">وضع التركيز</span></strong></div>
+<div class="item" onclick="go('s-prog')"><strong>📈 <span data-k="n8">تقدمي</span></strong></div>
+</div>
+</section>
+<section id="s-les" class="sec"><div class="card"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px"><h2 data-k="n2">الدروس</h2><select id="sf" onchange="loadC()" style="padding:6px;border-radius:8px;border:1px solid var(--bd)"></select></div><div id="lb" class="grid"></div></div></section>
+<section id="s-ex" class="sec"><div class="card"><h2 data-k="et" style="margin-bottom:8px">التمارين</h2><div id="eb"></div></div><div class="card"><h2 data-k="pt" style="margin-bottom:8px">الفروض PDF</h2><div id="exb" class="grid"></div></div></section>
+<section id="s-sum" class="sec"><div class="card"><h2 data-k="n4" style="margin-bottom:8px">الملخصات</h2><div id="sbx" class="grid"></div></div></section>
+<section id="s-ai" class="sec"><div class="card"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px"><h2>🤖 <span data-k="n5">أستاذ مذاكر</span></h2><span class="wtag">واجهة تجريبية (بانتظار ربط AI)</span></div><p style="font-size:.82rem;color:#475569;margin-bottom:8px">الأستاذ الذكي لمساعدتك في الدروس والتمارين وفق المنهاج المغربي (ردود المعاينة الحالية تجريبية فقط).</p><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px"><button class="pill" onclick="$('cq').value='اشرح لي درس الحسابيات';$('cf').requestSubmit()">شرح الحسابيات</button><button class="pill" onclick="$('cq').value='كيف أراجع للامتحان؟';$('cf').requestSubmit()">خطة المراجعة</button></div><div id="cb" style="background:var(--bg);border:1px solid var(--bd);border-radius:9px;padding:9px;height:160px;overflow-y:auto;margin-bottom:8px">مرحباً! أنا <b>أستاذ مذاكر</b> (واجهة تجريبية). اكتب سؤالك بالأسفل.</div><form id="cf" onsubmit="event.preventDefault();var q=$('cq');$('cb').innerHTML+='<div><b>أنت:</b> '+esc(q.value)+'</div><div style=color:#16A34A><b>أستاذ مذاكر (تجريبي):</b> سيتم تفعيل الإجابات الذكية الفعلية فور ربط الخادم بالذكاء الاصطناعي واختباره.</div>';q.value='';$('cb').scrollTop=$('cb').scrollHeight;" style="display:flex;gap:6px"><input id="cq" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--bd)" required placeholder="اكتب سؤالك..."><button class="btn bn">إرسال</button></form></div></section>
+<section id="s-ocr" class="sec">
+<div class="card"><h2>📷 قارئ استعمال الزمن المغربي ومخطط المعاملات</h2><span class="wtag">OCR التلقائي تجريبي • المخطط حسب المعاملات يعمل فعلياً</span><p style="font-size:.82rem;color:#475569;margin:6px 0">ارفع صورة استعمال زمانك المدرسي للمعاينة، ثم اضبط حصص مدرستك بالأسفل ليوزع التطبيق المراجعة <b>حسب سنتك ومعاملات موادك</b>.</p><input type="file" accept="image/*" onchange="var f=this.files[0];if(f){var r=new FileReader();r.onload=function(e){$('oi').src=e.target.result;$('oi').style.display='block';$('om').style.display='block'};r.readAsDataURL(f);}"><img id="oi" class="th" style="display:none"><p id="om" style="display:none;font-size:.8rem;color:#16A34A;margin-top:5px">✓ تم عرض صورة جدولك (OCR التلقائي سيُربط لاحقاً). اضبط حصصك:</p></div>
+<div class="card"><h3 style="color:var(--nv);margin-bottom:4px">📊 معاملات مستواك: <span id="coef-lbl" style="color:#16A34A"></span></h3><div id="coef-tags" style="margin-bottom:8px"></div><div id="tti"></div><button class="btn bg" style="margin-top:8px;width:100%" onclick="mkPlan()">بناء مخطط المراجعة حسب سنتي ومعاملاتي ✓</button><div id="tto"></div></div>
+</section>
+<section id="s-plan" class="sec">
+<div class="card"><h2>🎯 وضع التركيز العميق</h2><div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0"><button class="pill active" onclick="setFoc(25,this)">25 د</button><button class="pill" onclick="setFoc(45,this)">45 د</button><button class="pill" onclick="setFoc(5,this)">5 د راحة</button></div><div id="pm" style="font-size:2.3rem;font-weight:800;color:var(--nv);margin:8px 0">25:00</div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn bg" onclick="startP()">ابدأ</button><button class="btn bn" onclick="pauseP()">إيقاف</button><button class="btn" style="border:1px solid var(--bd)" onclick="resetP()">إعادة</button><button class="btn bn" style="background:#0F766E" onclick="$('fover').classList.add('on')">🖥️ شاشة التركيز الكاملة</button></div></div>
+<div class="card"><h3>📅 مخطط المراجعة الأسبوعي</h3><div id="pmr"></div></div>
+</section>
+<section id="s-prog" class="sec"><div class="card"><h2>📈 <span data-k="n8">تقدمي</span></h2><p id="pgt" style="margin-top:8px;font-weight:700"></p></div></section>
+</main>
+</div>
+<div class="fover" id="fover"><span class="tag" style="background:#22C55E;color:#0B1F3A">🎯 وضع التركيز مفعّل</span><h2 style="margin-top:10px" id="flbl">ركّز في مراجعتك بدون مشتتات</h2><div id="fpm" style="font-size:4rem;font-weight:800;margin:18px 0;color:#4ADE80">25:00</div><div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="btn bg" onclick="startP()">ابدأ / استمر</button><button class="btn bn" style="border:1px solid #fff" onclick="pauseP()">إيقاف</button><button class="btn" style="background:#DC2626;color:#fff" onclick="$('fover').classList.remove('on')">خروج</button></div></div>
+<div class="modal" id="md" onclick="if(event.target.id==='md')this.className='modal'"><div class="modal-in"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><h3 id="mt"></h3><button class="btn" onclick="$('md').className='modal'">✕</button></div><div id="mm" class="mbox"></div><img id="mi" class="th" style="display:none"><div id="mb" style="white-space:pre-line;line-height:1.8;margin-top:8px"></div><div id="mm2" class="mbox"></div></div></div>
+<nav class="bnav"><button class="active" data-s="s-home" onclick="go('s-home')">🏠<span>الرئيسية</span></button><button data-s="s-les" onclick="go('s-les')">📚<span>الدروس</span></button><button data-s="s-ai" onclick="go('s-ai')">🤖<span>الأستاذ</span></button><button data-s="s-ocr" onclick="go('s-ocr')">📷<span>المخطط</span></button><button data-s="s-plan" onclick="go('s-plan')">🎯<span>التركيز</span></button></nav>
+<footer>مذاكر – Moudhakkir • مجاني 100% • <a href="./admin.html" style="color:var(--n2)">دخول المطور</a></footer>
+<script src="./app.js"></script>
+</body>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       </html>
